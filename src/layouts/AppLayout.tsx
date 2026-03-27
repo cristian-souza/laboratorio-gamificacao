@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Settings, Bell, User, BarChart2, Zap, Shield, Terminal, Globe, Menu, X } from 'lucide-react';
+import { Settings, Bell, User, BarChart2, Zap, Shield, Terminal as TerminalIcon, Globe, Menu, X } from 'lucide-react';
 import { DataScrubber } from '../components/DataScrubber';
 import { SystemStatus } from '../components/SystemStatus';
+import { Terminal } from '../components/Terminal';
 
 export default function AppLayout() {
   const location = useLocation();
   const path = location.pathname;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
   const getScrubberCurrent = () => {
     if (path === '/') return 1;
@@ -21,7 +23,7 @@ export default function AppLayout() {
     { to: "/", label: "GERAL XP", icon: BarChart2 },
     { to: "/projetos", label: "PROJETOS", icon: Zap },
     { to: "/sobre", label: "HABILIDADES", icon: Shield },
-    { to: "/contato", label: "LOGS", icon: Terminal },
+    { to: "/contato", label: "LOGS", icon: TerminalIcon },
   ];
 
   return (
@@ -61,9 +63,12 @@ export default function AppLayout() {
                       SINCRONIZAR_DADOS
                   </button>
                   <div className="flex flex-col gap-2 mt-2">
-                      <div className="flex items-center gap-2 text-on-surface-variant/50 text-[0.65rem] font-display tracking-[0.1rem] uppercase">
-                          <Terminal size={10} /> TERMINAL
-                      </div>
+                      <button 
+                        onClick={() => setIsTerminalOpen(true)}
+                        className="flex items-center gap-2 text-on-surface-variant/50 text-[0.65rem] font-display tracking-[0.1rem] uppercase hover:text-primary transition-colors cursor-pointer"
+                      >
+                          <TerminalIcon size={10} /> TERMINAL
+                      </button>
                       <div className="flex items-center gap-2 text-on-surface-variant/50 text-[0.65rem] font-display tracking-[0.1rem] uppercase">
                           <Globe size={10} /> O LINHA_TEMPO
                       </div>
@@ -161,7 +166,12 @@ export default function AppLayout() {
                               © 2024 <span className="text-on-surface">LAB_INFINITO</span> // ACESSO_RESTRITO
                           </div>
                           <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-                              <span className="opacity-50">TERMINAL</span>
+                              <button 
+                                onClick={() => setIsTerminalOpen(true)}
+                                className="opacity-50 hover:text-primary hover:opacity-100 transition-colors cursor-pointer uppercase"
+                              >
+                                TERMINAL
+                              </button>
                               <Link
                                   to="/projetos"
                                   className="hover:text-primary transition-colors cursor-pointer"
@@ -185,6 +195,12 @@ export default function AppLayout() {
 
           {/* Global DataScrubber instance */}
           <DataScrubber current={getScrubberCurrent()} total={4} />
+
+          {/* Global Terminal Instance */}
+          <Terminal 
+            isOpen={isTerminalOpen} 
+            onClose={() => setIsTerminalOpen(false)} 
+          />
       </div>
   );
 }
