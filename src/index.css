@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Photonic Glow (Fundo com duas luzes radiais) */
+  .bg-photonic-glow {
+    background: radial-gradient(circle at top left, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at bottom right, rgba(207, 92, 255, 0.03) 0%, transparent 40%);
+  }
+}
