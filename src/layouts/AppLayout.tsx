@@ -69,10 +69,12 @@ export default function AppLayout() {
                       >
                           <TerminalIcon size={10} /> TERMINAL
                       </button>
-                      <div className="flex items-center gap-2 text-on-surface-variant/50 text-[0.65rem] font-display tracking-[0.1rem] uppercase">
-                          <Globe size={10} /> O LINHA_TEMPO
-                      </div>
-                  </div>
+                      <Link
+                        to="/sobre#timeline"
+                        className="flex items-center gap-2 text-on-surface-variant/50 text-[0.65rem] font-display tracking-[0.1rem] uppercase hover:text-primary transition-colors cursor-pointer"
+                      >
+                          <Globe size={10} /> LINHA_TEMPO
+                      </Link>                  </div>
               </div>
           </aside>
 
@@ -135,9 +137,6 @@ export default function AppLayout() {
                               </Link>
                           ))}
                       </div>
-                      <h2 className="md:hidden font-display text-primary font-bold text-sm tracking-[0.1rem]">
-                          LAB_DE_DADOS
-                      </h2>
                   </div>
 
                   <div className="flex gap-4 text-primary">
@@ -163,7 +162,7 @@ export default function AppLayout() {
                   <footer className="max-w-7xl mx-auto w-full px-6 md:px-12 mt-auto pb-24 md:pb-16">
                       <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 py-8 border-t-[0.5px] border-outline-variant/30 font-display text-[0.55rem] text-on-surface-variant tracking-[0.15rem] md:tracking-[0.2rem] uppercase">
                           <div className="text-center md:text-left opacity-70">
-                              © 2024 <span className="text-on-surface">LAB_INFINITO</span> // ACESSO_RESTRITO
+                              © 2026 <span className="text-on-surface">LAB_INFINITO</span> // ACESSO_RESTRITO
                           </div>
                           <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
                               <button 

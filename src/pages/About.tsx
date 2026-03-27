@@ -8,10 +8,15 @@ export default function About() {
   const { projects, loading: projectsLoading } = useGithubProjects('cristian-souza');
 
   const loading = userLoading || projectsLoading;
+  
+  // Filtra apenas projetos que tem a tag 'PORTFOLIO' para as especialidades
+  const portfolioProjects = useMemo(() => {
+    return projects.filter(p => p.tags?.includes("PORTFOLIO"));
+  }, [projects]);
 
   // Cálculos estáveis e dinâmicos para especialidades
   const specialties = useMemo(() => {
-    if (projectsLoading || projects.length === 0) return [];
+    if (projectsLoading || portfolioProjects.length === 0) return [];
 
     const techSystemNames: Record<string, string> = {
       'HTML': 'STRUCTURAL_MARKUP',
@@ -25,8 +30,8 @@ export default function About() {
     };
 
     // 1. Coletar todas as tags (ignorando as de controle)
-    const allTags = projects.flatMap(p => p.tags || [])
-      .filter(tag => !["portfolio", "destaque", "PROTOCOLO"].includes(tag));
+    const allTags = portfolioProjects.flatMap(p => p.tags || [])
+      .filter(tag => !["PORTFOLIO", "DESTAQUE", "PROTOCOLO"].includes(tag));
 
     // 2. Contar frequência de cada tag
     const tagCounts: Record<string, number> = {};
@@ -36,11 +41,10 @@ export default function About() {
     });
 
     // 3. Transformar em array e calcular porcentagem
-    // Fórmula: 75% base + (frequência / total_projetos) * 25%
     return Object.entries(tagCounts)
       .map(([label, count]) => {
-        const frequencyRatio = count / projects.length;
-        const percentage = Math.min(98, Math.round(75 + (frequencyRatio * 23))); // Máximo 98%
+        const frequencyRatio = count / portfolioProjects.length;
+        const percentage = Math.min(98, Math.round(75 + (frequencyRatio * 23)));
 
         return {
           name: techSystemNames[label] || `${label}_PROTOCOL`,
@@ -49,9 +53,53 @@ export default function About() {
           count
         };
       })
-      .sort((a, b) => b.count - a.count) // Mais frequentes primeiro
-      .slice(0, 6); // Top 6
-  }, [projects, projectsLoading]);
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+  }, [portfolioProjects, projectsLoading]);
+
+  // Gera cronologia de evolução agrupada por ano
+  const timelineEvents = useMemo(() => {
+    if (loading || !user || projects.length === 0) return [];
+
+    const startYear = new Date(user.created_at).getFullYear();
+    const currentYear = new Date().getFullYear();
+    const years = [];
+
+    for (let year = startYear; year <= currentYear; year++) {
+      const yearProjects = projects.filter(p => p.createdAt && new Date(p.createdAt).getFullYear() === year);
+      
+      let title = "";
+      let description = "";
+
+      if (year === startYear) {
+        title = "INICIALIZAÇÃO_DO_SISTEMA";
+        description = `Criação do perfil na rede neural do GitHub. Início da jornada de exploração em desenvolvimento de software e primeiros commits realizados.`;
+      } else if (yearProjects.length > 0) {
+        // Pega as tecnologias mais usadas no ano e garante que estejam em MAIÚSCULAS
+        const yearTechs = [...new Set(yearProjects.flatMap(p => p.tags || []))]
+          .filter(t => t !== "PROTOCOLO")
+          .map(t => t.toUpperCase())
+          .slice(0, 3);
+          
+        title = `EXPANSÃO_SETOR_${year}`;
+        description = `Fase de aprimoramento técnico focada em ${yearTechs.join(', ')}. Desenvolvimento de ${yearProjects.length} ${yearProjects.length === 1 ? 'módulo de experimento' : 'módulos de experimentos'} sincronizados no laboratório.`;
+      } else {
+        title = `OTIMIZAÇÃO_DE_NÚCLEO_${year}`;
+        description = `Período dedicado à pesquisa teórica, manutenção de sistemas existentes e refinamento de processos internos de desenvolvimento.`;
+      }
+
+      years.push({
+        id: `year-${year}`,
+        year: year.toString(),
+        title,
+        description,
+        projectsCount: yearProjects.length
+      });
+    }
+
+    // Ordena do mais recente para o mais antigo para a visualização
+    return years.reverse();
+  }, [projects, loading, user]);
 
 
   return (
@@ -292,66 +340,58 @@ export default function About() {
               </div>
           </section>
           {/* LINHA DO TEMPO */}
-          <section className="mb-20">
+          <section id="timeline" className="mb-20">
               <h2 className="font-display text-2xl text-on-surface font-bold tracking-[-0.01em] mb-12">
                   LINHA DO TEMPO DE EVOLUÇÃO
               </h2>
 
               <div className="flex flex-col border-l border-outline-variant/20 ml-2 lg:ml-8 gap-12 relative">
-                  {/* Event 1 */}
-                  <div className="pl-10 relative">
-                      <div className="absolute -left-[5px] top-1 w-[9px] h-[9px] bg-primary rounded-sm shadow-[0_0_8px_rgba(0,240,255,0.6)] rotate-45" />
-                      <div className="bg-surface-low border-[0.5px] border-outline-variant/30 p-6 md:p-8 hover:border-primary/40 transition-colors max-w-3xl">
-                          <span className="font-display text-[0.55rem] text-primary tracking-[0.1rem] uppercase mb-4 block">
-                              PROTOCOLO_INICIAL // 2021
-                          </span>
-                          <h3 className="font-display text-xl text-on-surface font-bold tracking-[-0.01em] mb-3">
-                              Primeiro Código
-                          </h3>
-                          <p className="font-body text-[0.85rem] text-on-surface-variant leading-relaxed">
-                              Execução do script "Hello World" em ambiente
-                              local. Descoberta dos fundamentos da estrutura de
-                              sistemas web e a lógica primordial de algoritmos.
-                          </p>
-                      </div>
-                  </div>
+                  {timelineEvents.length > 0 ? (
+                    timelineEvents.map((event, idx) => {
+                      const themes = [
+                        { text: 'text-primary', bg: 'bg-primary', shadow: 'shadow-[0_0_8px_rgba(0,240,255,0.6)]', border: 'hover:border-primary/40' },
+                        { text: 'text-secondary-container', bg: 'bg-secondary-container', shadow: 'shadow-[0_0_8px_rgba(207,92,255,0.6)]', border: 'hover:border-secondary-container/40' },
+                        { text: 'text-tertiary-container', bg: 'bg-tertiary-container', shadow: 'shadow-[0_0_8px_rgba(0,251,64,0.6)]', border: 'hover:border-tertiary-container/40' }
+                      ];
+                      const theme = themes[idx % themes.length];
+                      
+                      // Alterna o recuo (margin-left) para criar um efeito visual dinâmico
+                      const indentClasses = [
+                        "ml-0",
+                        "ml-0 md:ml-12 lg:ml-24",
+                        "ml-0 md:ml-6 lg:ml-12"
+                      ][idx % 3];
 
-                  {/* Event 2 */}
-                  <div className="pl-10 relative">
-                      <div className="absolute -left-[5px] top-1 w-[9px] h-[9px] bg-secondary-container rounded-sm shadow-[0_0_8px_rgba(207,92,255,0.6)] rotate-45" />
-                      <div className="bg-surface-low border-[0.5px] border-outline-variant/30 p-6 md:p-8 hover:border-secondary-container/40 transition-colors max-w-3xl ml-0 md:ml-12 lg:ml-24">
-                          <span className="font-display text-[0.55rem] text-secondary-container tracking-[0.1rem] uppercase mb-4 block">
-                              EXPANSÃO_FRONTEND // 2022
-                          </span>
-                          <h3 className="font-display text-xl text-on-surface font-bold tracking-[-0.01em] mb-3">
-                              Exploração React
-                          </h3>
-                          <p className="font-body text-[0.85rem] text-on-surface-variant leading-relaxed">
-                              Implementação de arquiteturas baseadas em
-                              componentes. Início do desenvolvimento de
-                              interfaces reativas e integração com APIs de dados
-                              externos.
-                          </p>
-                      </div>
-                  </div>
-
-                  {/* Event 3 */}
-                  <div className="pl-10 relative">
-                      <div className="absolute -left-[5px] top-1 w-[9px] h-[9px] bg-tertiary-container rounded-sm shadow-[0_0_8px_rgba(0,251,64,0.6)] rotate-45" />
-                      <div className="bg-surface-low border-[0.5px] border-outline-variant/30 p-6 md:p-8 hover:border-tertiary-container/40 transition-colors max-w-3xl">
-                          <span className="font-display text-[0.55rem] text-tertiary-container tracking-[0.1rem] uppercase mb-4 block">
-                              ESTADO_ATUAL // 2024
-                          </span>
-                          <h3 className="font-display text-xl text-on-surface font-bold tracking-[-0.01em] mb-3">
-                              Labs & Experimentos
-                          </h3>
-                          <p className="font-body text-[0.85rem] text-on-surface-variant leading-relaxed">
-                              Foco em design systems, performance otimizada e
-                              interfaces imersivas (HUD aesthetics). Construindo
-                              pontes entre o design avançado e o código limpo.
-                          </p>
-                      </div>
-                  </div>
+                      return (
+                        <div key={event.id} className="pl-10 relative">
+                            <div className={`absolute -left-[5px] top-1 w-[9px] h-[9px] ${theme.bg} rounded-sm ${theme.shadow} rotate-45`} />
+                            <div className={`bg-surface-low border-[0.5px] border-outline-variant/30 p-6 md:p-8 ${theme.border} transition-colors max-w-3xl ${indentClasses}`}>
+                                <span className={`font-display text-[0.55rem] ${theme.text} tracking-[0.1rem] uppercase mb-4 block`}>
+                                    MARCO_TEMPORAL // {event.year}
+                                </span>
+                                <h3 className="font-display text-xl text-on-surface font-bold tracking-[-0.01em] mb-3">
+                                    {event.title}
+                                </h3>
+                                <p className="font-body text-[0.85rem] text-on-surface-variant leading-relaxed">
+                                    {event.description}
+                                </p>
+                                {event.projectsCount > 0 && (
+                                  <div className="mt-4 pt-4 border-t border-outline-variant/10 flex items-center gap-2">
+                                    <div className={`w-1 h-1 rounded-full ${theme.bg}`} />
+                                    <span className="font-display text-[0.5rem] text-on-surface-variant tracking-[0.1rem] uppercase">
+                                      {event.projectsCount} {event.projectsCount === 1 ? 'PROJETO_SINCRONIZADO' : 'PROJETOS_SINCRONIZADOS'}
+                                    </span>
+                                  </div>
+                                )}
+                            </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="pl-10 text-on-surface-variant font-display text-xs uppercase tracking-widest animate-pulse">
+                      {loading ? "Sincronizando cronologia..." : "Nenhum marco de evolução detectado no servidor."}
+                    </div>
+                  )}
               </div>
           </section>
       </div>

@@ -7,11 +7,14 @@ import { useGithubProjects } from '../hooks/useGithubProjects';
 
 export default function Home() {
   const { projects, loading } = useGithubProjects('cristian-souza');
-  const featuredProjects = projects.filter(p => p.featured);
+  
+  // Filtra apenas projetos que tem a tag 'portfolio' para exibição no site
+  const portfolioProjects = projects.filter(p => p.tags?.includes("PORTFOLIO"));
+  const featuredProjects = portfolioProjects.filter(p => p.featured);
 
   // Estabiliza e calcula as tecnologias para o módulo XP
   const displayTechs = useMemo(() => {
-    if (loading || projects.length === 0) {
+    if (loading || portfolioProjects.length === 0) {
       return [
         { name: "HTML_CSS", val: 8 },
         { name: "JAVASCRIPT", val: 7 },

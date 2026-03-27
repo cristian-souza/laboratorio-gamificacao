@@ -5,10 +5,13 @@ import { useGithubProjects } from '../hooks/useGithubProjects';
 export default function Projects() {
   const { projects, loading, error } = useGithubProjects('cristian-souza');
 
+  // Filtramos apenas projetos que tem a tag 'PORTFOLIO'
+  const portfolioProjects = projects.filter(p => p.tags?.includes("PORTFOLIO"));
+
   // Filtramos os projetos conforme os tópicos do GitHub
-  const featuredProjects = projects.filter(p => p.featured);
-  const ongoingProjects = projects.filter(p => !p.featured && p.progress !== undefined && p.progress < 100);
-  const stableProjects = projects.filter(p => !p.featured && (p.progress === 100 || p.progress === undefined));
+  const featuredProjects = portfolioProjects.filter(p => p.featured);
+  const ongoingProjects = portfolioProjects.filter(p => !p.featured && p.progress !== undefined && p.progress < 100);
+  const stableProjects = portfolioProjects.filter(p => !p.featured && (p.progress === 100 || p.progress === undefined));
 
   if (loading) {
     return (

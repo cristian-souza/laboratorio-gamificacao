@@ -12,6 +12,7 @@ interface GithubRepo {
   topics: string[];
   stargazers_count: number;
   html_url: string;
+  created_at: string;
 }
 
 export function useGithubProjects(username: string) {
@@ -29,14 +30,15 @@ export function useGithubProjects(username: string) {
 
         const data: GithubRepo[] = await response.json();
 
-        // FILTRO: Apenas repositórios com o tópico "portfolio"
-        const filteredRepos = data.filter(repo => 
-          repo.topics?.includes("portfolio")
-        );
+        const mappedProjects: ProjectData[] = data.map((repo: GithubRepo) => {
+          // Mantemos os tópicos originais para filtragem interna, mas preparamos a exibição
+          const allTags = [
+            ...(repo.language ? [repo.language.toUpperCase()] : []),
+            ...(repo.topics?.map(t => t.toUpperCase()) || [])
+          ];
 
-        const mappedProjects: ProjectData[] = filteredRepos.map((repo: GithubRepo) => {
-          // Removemos os tópicos de controle "portfolio" e "destaque" da lista de tags para não aparecer no card
-          const cleanTopics = repo.topics?.filter(topic => topic !== "portfolio" && topic !== "destaque") || [];
+          // Removemos os tópicos de controle da exibição visual
+          const displayTags = allTags.filter(tag => tag !== "PORTFOLIO" && tag !== "DESTAQUE");
           
           return {
             id: repo.name.substring(0, 10).toUpperCase(),
@@ -45,9 +47,10 @@ export function useGithubProjects(username: string) {
             coords: `ID: ${repo.id} // V.${repo.default_branch.toUpperCase()}`,
             status: repo.archived ? "LEGACY" : "OPERACIONAL",
             progress: 100,
-            tags: repo.language ? [repo.language.toUpperCase(), ...cleanTopics] : cleanTopics.length > 0 ? cleanTopics : ["PROTOCOLO"],
+            tags: allTags, // Passamos todas para poder filtrar nas páginas
             featured: repo.topics?.includes("destaque") || false,
-            url: repo.html_url
+            url: repo.html_url,
+            createdAt: repo.created_at
           };
         });
 

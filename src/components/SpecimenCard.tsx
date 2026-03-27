@@ -14,6 +14,7 @@ export interface ProjectData {
     eta?: string;
     tags?: string[];
     url?: string;
+    createdAt?: string;
 }
 
 interface SpecimenCardProps extends ProjectData {
@@ -59,7 +60,9 @@ export const SpecimenCard: React.FC<SpecimenCardProps> = ({
 
       {tags && (
         <div className="flex flex-wrap gap-2">
-          {tags.map(tag => (
+          {tags
+            .filter(tag => tag !== "PORTFOLIO" && tag !== "DESTAQUE")
+            .map(tag => (
             <span key={tag} className="border-[0.5px] border-outline-variant/40 bg-surface/40 px-2 py-0.5 font-display text-[0.55rem] tracking-[0.1rem] text-on-surface-variant uppercase group-hover:border-primary/30 transition-colors">
               {tag}
             </span>

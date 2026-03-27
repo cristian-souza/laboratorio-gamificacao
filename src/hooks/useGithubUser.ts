@@ -6,6 +6,7 @@ interface GithubUser {
   bio: string;
   location: string;
   login: string;
+  created_at: string;
 }
 
 export function useGithubUser(username: string) {
