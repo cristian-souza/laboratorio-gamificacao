@@ -1,8 +1,58 @@
-import { Rocket, GitBranch, PenTool, Code, Plus, User, Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
+import { Rocket, GitBranch, PenTool, Code, Plus, User, Loader2, Zap } from 'lucide-react';
 import { useGithubUser } from '../hooks/useGithubUser';
+import { useGithubProjects } from '../hooks/useGithubProjects';
 
 export default function About() {
-  const { user, loading } = useGithubUser('cristian-souza');
+  const { user, loading: userLoading } = useGithubUser('cristian-souza');
+  const { projects, loading: projectsLoading } = useGithubProjects('cristian-souza');
+
+  const loading = userLoading || projectsLoading;
+
+  // Cálculos estáveis e dinâmicos para especialidades
+  const specialties = useMemo(() => {
+    if (projectsLoading || projects.length === 0) return [];
+
+    const techSystemNames: Record<string, string> = {
+      'HTML': 'STRUCTURAL_MARKUP',
+      'CSS': 'VISUAL_ENGINE',
+      'JAVASCRIPT': 'LOGIC_NUCLEUS',
+      'TYPESCRIPT': 'TYPED_CORE',
+      'REACT': 'DYNAMIC_MODELS',
+      'TAILWIND': 'STYLE_ACCELERATOR',
+      'NODE.JS': 'BACKEND_SYNCHRONIZER',
+      'VITE': 'COMPILATION_PROTOCOL',
+    };
+
+    // 1. Coletar todas as tags (ignorando as de controle)
+    const allTags = projects.flatMap(p => p.tags || [])
+      .filter(tag => !["portfolio", "destaque", "PROTOCOLO"].includes(tag));
+
+    // 2. Contar frequência de cada tag
+    const tagCounts: Record<string, number> = {};
+    allTags.forEach(tag => {
+      const upper = tag.toUpperCase();
+      tagCounts[upper] = (tagCounts[upper] || 0) + 1;
+    });
+
+    // 3. Transformar em array e calcular porcentagem
+    // Fórmula: 75% base + (frequência / total_projetos) * 25%
+    return Object.entries(tagCounts)
+      .map(([label, count]) => {
+        const frequencyRatio = count / projects.length;
+        const percentage = Math.min(98, Math.round(75 + (frequencyRatio * 23))); // Máximo 98%
+
+        return {
+          name: techSystemNames[label] || `${label}_PROTOCOL`,
+          label,
+          val: percentage,
+          count
+        };
+      })
+      .sort((a, b) => b.count - a.count) // Mais frequentes primeiro
+      .slice(0, 6); // Top 6
+  }, [projects, projectsLoading]);
+
 
   return (
       <div className="p-8 md:p-12 pb-32 flex flex-col max-w-7xl mx-auto w-full">
@@ -125,90 +175,78 @@ export default function About() {
                       ESPECIALIDADES
                   </h2>
                   <span className="font-display text-[0.55rem] text-primary tracking-[0.1rem] uppercase">
-                      ARRAY: CAPABILITIES.length = 4
+                      ARRAY: CAPABILITIES.length = {specialties.length || 4}
                   </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                  {/* Skill 1: HTML */}
-                  <div className="flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                          <span className="font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem]">
-                              STRUCTURAL_MARKUP (HTML)
-                          </span>
-                          <span className="font-display text-[0.65rem] text-primary uppercase tracking-[0.1rem]">
-                              92%
-                          </span>
-                      </div>
-                      <div className="flex gap-1 h-3 w-full">
-                          {[...Array(10)].map((_, i) => (
-                              <div
-                                  key={i}
-                                  className={`flex-1 ${i < 9 ? "bg-primary shadow-[0_0_5px_rgba(0,240,255,0.4)]" : "bg-outline-variant/20"}`}
-                              />
-                          ))}
-                      </div>
-                  </div>
+                  {specialties.length > 0 ? (
+                      specialties.map((spec, idx) => {
+                          const colors = [
+                              { text: 'text-primary', bg: 'bg-primary', shadow: 'shadow-[0_0_5px_rgba(0,240,255,0.4)]' },
+                              { text: 'text-secondary-container', bg: 'bg-secondary-container', shadow: 'shadow-[0_0_5px_rgba(207,92,255,0.4)]' },
+                              { text: 'text-tertiary-container', bg: 'bg-tertiary-container', shadow: 'shadow-[0_0_5px_rgba(0,251,64,0.4)]' }
+                          ];
+                          const theme = colors[idx % colors.length];
 
-                  {/* Skill 2: CSS */}
-                  <div className="flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                          <span className="font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem]">
-                              VISUAL_ENGINE (CSS)
-                          </span>
-                          <span className="font-display text-[0.65rem] text-primary uppercase tracking-[0.1rem]">
-                              90%
-                          </span>
-                      </div>
-                      <div className="flex gap-1 h-3 w-full">
-                          {[...Array(10)].map((_, i) => (
-                              <div
-                                  key={i}
-                                  className={`flex-1 ${i < 9 ? "bg-primary shadow-[0_0_5px_rgba(0,240,255,0.4)]" : "bg-outline-variant/20"}`}
-                              />
-                          ))}
-                      </div>
-                  </div>
+                          return (
+                              <div key={spec.name} className="flex flex-col gap-3 group">
+                                  <div className="flex justify-between items-center">
+                                      <span className={`font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem] group-hover:${theme.text} transition-colors`}>
+                                          {spec.name} ({spec.label})
+                                      </span>
+                                      <span className={`font-display text-[0.65rem] ${theme.text} uppercase tracking-[0.1rem]`}>
+                                          {spec.val}%
+                                      </span>
+                                  </div>
+                                  <div className="flex gap-1 h-3 w-full">
+                                      {[...Array(10)].map((_, i) => (
+                                          <div
+                                              key={i}
+                                              className={`flex-1 transition-all duration-500 ${i < Math.round(spec.val / 10) ? `${theme.bg} ${theme.shadow}` : "bg-outline-variant/20"}`}
+                                              style={{ transitionDelay: `${i * 50}ms` }}
+                                          />
+                                      ))}
+                                  </div>
+                              </div>
+                          );
+                      })
+                  ) : (
+                      // Fallback estático enquanto carrega ou se não houver dados
+                      [
+                          { name: 'STRUCTURAL_MARKUP', label: 'HTML', val: 92 },
+                          { name: 'VISUAL_ENGINE', label: 'CSS', val: 90 },
+                          { name: 'LOGIC_NUCLEUS', label: 'JAVASCRIPT', val: 85 },
+                          { name: 'DYNAMIC_MODELS', label: 'REACT', val: 80 }
+                      ].map((spec, idx) => {
+                          const theme = [
+                              { text: 'text-primary', bg: 'bg-primary', shadow: 'shadow-[0_0_5px_rgba(0,240,255,0.4)]' },
+                              { text: 'text-secondary-container', bg: 'bg-secondary-container', shadow: 'shadow-[0_0_5px_rgba(207,92,255,0.4)]' },
+                              { text: 'text-tertiary-container', bg: 'bg-tertiary-container', shadow: 'shadow-[0_0_5px_rgba(0,251,64,0.4)]' }
+                          ][idx % 3];
 
-                  {/* Skill 3: JS */}
-                  <div className="flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                          <span className="font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem]">
-                              LOGIC_NUCLEUS (JAVASCRIPT)
-                          </span>
-                          <span className="font-display text-[0.65rem] text-secondary-container uppercase tracking-[0.1rem]">
-                              85%
-                          </span>
-                      </div>
-                      <div className="flex gap-1 h-3 w-full">
-                          {[...Array(10)].map((_, i) => (
-                              <div
-                                  key={i}
-                                  className={`flex-1 ${i < 8 ? "bg-secondary-container shadow-[0_0_5px_rgba(207,92,255,0.4)]" : "bg-outline-variant/20"}`}
-                              />
-                          ))}
-                      </div>
-                  </div>
-
-                  {/* Skill 4: React */}
-                  <div className="flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                          <span className="font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem]">
-                              DYNAMIC_MODELS (REACT)
-                          </span>
-                          <span className="font-display text-[0.65rem] text-secondary-container uppercase tracking-[0.1rem]">
-                              75%
-                          </span>
-                      </div>
-                      <div className="flex gap-1 h-3 w-full">
-                          {[...Array(10)].map((_, i) => (
-                              <div
-                                  key={i}
-                                  className={`flex-1 ${i < 7 ? "bg-secondary-container shadow-[0_0_5px_rgba(207,92,255,0.4)]" : "bg-outline-variant/20"}`}
-                              />
-                          ))}
-                      </div>
-                  </div>
+                          return (
+                              <div key={spec.name} className="flex flex-col gap-3">
+                                  <div className="flex justify-between items-center opacity-40">
+                                      <span className="font-display text-[0.65rem] text-on-surface uppercase tracking-[0.1rem]">
+                                          {spec.name} ({spec.label})
+                                      </span>
+                                      <span className={`font-display text-[0.65rem] ${theme.text} uppercase tracking-[0.1rem]`}>
+                                          {spec.val}%
+                                      </span>
+                                  </div>
+                                  <div className="flex gap-1 h-3 w-full">
+                                      {[...Array(10)].map((_, i) => (
+                                          <div
+                                              key={i}
+                                              className={`flex-1 ${i < Math.round(spec.val / 10) ? `${theme.bg} opacity-20` : "bg-outline-variant/10"}`}
+                                          />
+                                      ))}
+                                  </div>
+                              </div>
+                          )
+                      })
+                  )}
               </div>
           </section>
 

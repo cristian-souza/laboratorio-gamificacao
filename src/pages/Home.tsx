@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Loader2 } from 'lucide-react';
 import { SpecimenCard } from '../components/SpecimenCard';
@@ -6,6 +7,35 @@ import { useGithubProjects } from '../hooks/useGithubProjects';
 export default function Home() {
   const { projects, loading } = useGithubProjects('cristian-souza');
   const featuredProjects = projects.filter(p => p.featured);
+
+  // Estabiliza e calcula as tecnologias para o módulo XP
+  const displayTechs = useMemo(() => {
+    if (loading || projects.length === 0) {
+      return [
+        { name: "HTML_CSS", val: 8 },
+        { name: "JAVASCRIPT", val: 7 },
+        { name: "REACT_JS", val: 6 },
+        { name: "TAILWIND", val: 7 }
+      ];
+    }
+
+    const allTags = projects.flatMap(p => p.tags || [])
+      .filter(tag => !["portfolio", "destaque", "PROTOCOLO"].includes(tag));
+
+    const tagCounts: Record<string, number> = {};
+    allTags.forEach(tag => {
+      const upper = tag.toUpperCase();
+      tagCounts[upper] = (tagCounts[upper] || 0) + 1;
+    });
+
+    return Object.entries(tagCounts)
+      .map(([name, count]) => ({
+        name: name.replace('.', '_'),
+        val: Math.min(10, Math.floor(6 + (count / projects.length) * 4)) // Escala de 6 a 10
+      }))
+      .sort((a, b) => b.val - a.val)
+      .slice(0, 4);
+  }, [projects, loading]);
 
   return (
     <div className="p-8 md:p-12 pb-32 flex flex-col gap-16 max-w-7xl mx-auto w-full">
@@ -56,21 +86,19 @@ export default function Home() {
            </div>
 
            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
-              {[
-                {name: "HTML_CSS", val: 8}, {name: "JAVASCRIPT", val: 6}, 
-                {name: "REACT_JS", val: 5}, {name: "TAILWIND", val: 7}
-              ].map((tech) => (
-                <div key={tech.name} className="border-[0.5px] border-outline-variant/20 bg-surface/40 p-3 flex flex-col gap-2">
-                   <span className="font-display text-[0.55rem] text-on-surface-variant uppercase tracking-[0.1rem]">{tech.name}</span>
+              {displayTechs.map((tech) => (
+                <div key={tech.name} className="border-[0.5px] border-outline-variant/20 bg-surface/40 p-3 flex flex-col gap-2 group/tech hover:border-primary/40 transition-colors">
+                   <span className="font-display text-[0.55rem] text-on-surface-variant uppercase tracking-[0.1rem] group-hover/tech:text-primary transition-colors">{tech.name}</span>
                    <h4 className="font-display text-sm text-primary mb-1">{tech.name.replace('_', ' ')}</h4>
                    <div className="flex gap-px h-1 w-full">
                       {[...Array(10)].map((_, i) => (
-                        <div key={i} className={`flex-1 ${i < tech.val ? 'bg-primary/60' : 'bg-outline-variant/20'}`} />
+                        <div key={i} className={`flex-1 ${i < tech.val ? 'bg-primary/60 group-hover/tech:bg-primary transition-colors' : 'bg-outline-variant/20'}`} />
                       ))}
                    </div>
                 </div>
               ))}
            </div>
+
         </div>
       </section>
 
