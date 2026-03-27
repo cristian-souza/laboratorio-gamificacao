@@ -36,6 +36,15 @@ export default {
         display: ['"Space Grotesk"', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
       },
+      keyframes: {
+        'progress-bar': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0%)' },
+        }
+      },
+      animation: {
+        'progress-bar': 'progress-bar linear forwards',
+      }
     },
   },
   plugins: [],

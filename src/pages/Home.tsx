@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Loader2 } from 'lucide-react';
 import { SpecimenCard } from '../components/SpecimenCard';
+import { SpecimenCarousel } from '../components/SpecimenCarousel';
 import { useGithubProjects } from '../hooks/useGithubProjects';
 
 export default function Home() {
@@ -119,12 +120,9 @@ export default function Home() {
            </div>
          ) : (
            <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {featuredProjects.map(project => (
-                  <SpecimenCard key={project.id} {...project} />
-                ))}
-            </div>
-            {featuredProjects.length === 0 && (
+            {featuredProjects.length > 0 ? (
+              <SpecimenCarousel projects={featuredProjects} autoPlayInterval={15000} />
+            ) : (
               <p className="font-display text-xs text-on-surface-variant uppercase tracking-widest text-center py-12 border border-dashed border-outline-variant/20 bg-surface-low">
                 Nenhum módulo de experimento marcado com estrela no GitHub.
               </p>

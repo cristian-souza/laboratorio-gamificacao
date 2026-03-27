@@ -1,10 +1,11 @@
 import { Activity, Loader2, AlertCircle } from 'lucide-react';
-import { SpecimenCard } from '../components/SpecimenCard';
+import { SpecimenCarousel } from '../components/SpecimenCarousel';
 import { useGithubProjects } from '../hooks/useGithubProjects';
 
 export default function Projects() {
   const { projects, loading, error } = useGithubProjects('cristian-souza');
 
+  // Filtramos os projetos conforme os tópicos do GitHub
   const featuredProjects = projects.filter(p => p.featured);
   const ongoingProjects = projects.filter(p => !p.featured && p.progress !== undefined && p.progress < 100);
   const stableProjects = projects.filter(p => !p.featured && (p.progress === 100 || p.progress === undefined));
@@ -51,20 +52,16 @@ export default function Projects() {
         </p>
       </header>
 
-      {/* ESPÉCIME_EM_DESTAQUE */}
+      {/* EXPERIMENTOS EM DESTAQUE */}
       {featuredProjects.length > 0 && (
         <section className="mb-16">
            <div className="flex items-center gap-3 mb-8">
               <div className="w-2 h-2 bg-secondary-container rounded-full animate-pulse" />
               <h3 className="font-display text-lg text-on-surface font-bold tracking-[0.1rem] uppercase">
-                 ESPÉCIME_EM_DESTAQUE
+                 EXPERIMENTOS EM DESTAQUE
               </h3>
            </div>
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {featuredProjects.map(project => (
-                <SpecimenCard key={project.id} {...project} />
-              ))}
-           </div>
+           <SpecimenCarousel projects={featuredProjects} autoPlayInterval={15000} />
         </section>
       )}
 
@@ -77,12 +74,7 @@ export default function Projects() {
               </h3>
               <span className="font-display text-[0.55rem] text-on-surface-variant tracking-[0.1rem]">SCAN ATIVO</span>
            </div>
-           
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ongoingProjects.map(project => (
-                <SpecimenCard key={project.id} {...project} className="!p-6" />
-              ))}
-           </div>
+           <SpecimenCarousel projects={ongoingProjects} autoPlayInterval={15000} />
         </section>
       )}
 
@@ -95,15 +87,14 @@ export default function Projects() {
             <span className="font-display text-[0.55rem] text-on-surface-variant tracking-[0.1rem]">DADOS_SINCRONIZADOS</span>
          </div>
          
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {stableProjects.map(project => (
-              <SpecimenCard key={project.id} {...project} />
-            ))}
-         </div>
-         {projects.length === 0 && (
-           <p className="font-display text-xs text-on-surface-variant uppercase tracking-widest text-center py-12">
-             Nenhum módulo de experimento encontrado no servidor.
-           </p>
+         {stableProjects.length > 0 ? (
+           <SpecimenCarousel projects={stableProjects} autoPlayInterval={15000} />
+         ) : (
+           projects.length === 0 && (
+             <p className="font-display text-xs text-on-surface-variant uppercase tracking-widest text-center py-12">
+               Nenhum módulo de experimento encontrado no servidor.
+             </p>
+           )
          )}
       </section>
     </div>

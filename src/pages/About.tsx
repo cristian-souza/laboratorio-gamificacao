@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Rocket, GitBranch, PenTool, Code, Plus, User, Loader2, Zap } from 'lucide-react';
+import { Rocket, GitBranch, PenTool, Code, Plus, User, Loader2 } from 'lucide-react';
 import { useGithubUser } from '../hooks/useGithubUser';
 import { useGithubProjects } from '../hooks/useGithubProjects';
 
