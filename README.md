@@ -1,4 +1,4 @@
-# 🧪 Laboratório de Experimentos Digitais
+1# 🧪 Laboratório de Experimentos Digitais
 
 Este projeto é um **portfólio gamificado** com estética futurista/cyberpunk, desenvolvido para explorar as fronteiras do desenvolvimento web moderno. Mais do que uma vitrine de projetos, é um ambiente de experimentação de UI/UX inspirado em interfaces táticas e sistemas operacionais avançados.
 
@@ -10,18 +10,18 @@ Este projeto é um **portfólio gamificado** com estética futurista/cyberpunk, 
 ## 📡 Características do Protocolo
 
 - **Interface Tática (UI/UX):** Design baseado em Material Design 3, adaptado para uma estética de "Laboratório Digital" com animações de pulso, barras de progresso dinâmicas e tipografia display impactante.
-- **Sincronização Neural (GitHub API):** Consumo dinâmico de repositórios via API do GitHub, filtrando automaticamente projetos marcados com o tópico `portfolio`.
-- **Módulo de Gamificação:** Sistema visual de XP (Experience Points) e níveis para representar proficiência técnica em diferentes tecnologias.
+- **Fundo Atômico Dinâmico:** Sistema de partículas de **Prótons** que cruzam a tela suavemente, criando um ambiente imersivo e energético por trás de todas as páginas.
+- **Sincronização Neural (GitHub API):** Consumo dinâmico de repositórios via API do GitHub, filtrando automaticamente projetos e exibindo-os em carrosséis interativos.
 - **Central de Comunicação Segura:** Formulário de contato integrado com **Netlify Functions** e **Resend** para processamento de mensagens em tempo real.
-- **Status do Sistema:** Componentes de monitoramento simulado que reforçam a imersão na temática tecnológica.
+- **Status do Sistema:** Módulos de monitoramento em tempo real (CPU, Firewall, Encrypt) que reforçam a imersão na temática tecnológica.
 
 ## 🛠️ Pilha Tecnológica
 
 - **Core:** React 19 + TypeScript
-- **Estilização:** Tailwind CSS (com configurações customizadas de cores e fontes)
-- **Ícones:** Lucide React
+- **Estilização:** Tailwind CSS (com configurações customizadas de animações `proton-drift` e `proton-pulse`)
+- **Ícones:** Lucide React & React Icons (Font Awesome)
 - **Roteamento:** React Router DOM
-- **Backend/Serverless:** Netlify Functions
+- **Backend/Serverless:** Netlify Functions (Netlify v5)
 - **Build Tool:** Vite
 
 ## 🚀 Inicialização do Laboratório
@@ -52,11 +52,11 @@ Para rodar o projeto localmente, siga os passos:
 
 ```text
 src/
-├── components/   # Módulos de interface (SystemStatus, SpecimenCard, etc.)
-├── hooks/        # Lógica de conexão (GitHub API, DataScrubber)
-├── pages/        # Setores do laboratório (Home, Projects, Contact)
-├── layouts/      # Estrutura base da aplicação
-└── data/         # Protocolos e dados estáticos
+├── assets/       # Ativos estáticos (SVG, Ícones, Imagens)
+├── components/   # Módulos de interface (LaboratoryBackground, SpecimenCard, Terminal, etc.)
+├── hooks/        # Lógica de conexão (GitHub API, MouseTilt, etc.)
+├── layouts/      # Estrutura base da aplicação (AppLayout)
+└── pages/        # Setores do laboratório (Home, Projects, About, Contact)
 ```
 
 ---
