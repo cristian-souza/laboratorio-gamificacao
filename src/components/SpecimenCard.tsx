@@ -31,11 +31,11 @@ export const SpecimenCard: React.FC<SpecimenCardProps> = ({
       <div className="flex justify-between items-start flex-wrap gap-4">
         <div className="flex flex-col gap-2">
           <span className="font-display text-[0.6rem] text-primary uppercase tracking-[0.2rem] opacity-70 group-hover:opacity-100 transition-opacity flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${progress !== undefined && progress < 100 ? 'bg-secondary-container animate-pulse' : 'bg-primary'}`} />
+            <div className={`w-1.5 h-1.5 rounded-full ${progress !== undefined && progress < 100 ? 'bg-secondary-container animate-pulse' : 'bg-primary animate-pulse-glow'}`} />
             ESPÉCIME: {id}
           </span>
           <div className="flex items-center gap-3">
-            <h2 className="font-display text-2xl md:text-3xl text-primary tracking-[-0.01em] font-bold uppercase">
+            <h2 className="font-display text-2xl md:text-3xl text-primary tracking-[-0.01em] font-bold uppercase group-hover:animate-flicker transition-all">
               {title}
             </h2>
             {url && <ExternalLink size={16} className="text-primary/40 group-hover:text-primary transition-colors" />}

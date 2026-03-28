@@ -22,36 +22,39 @@ export const SystemStatus: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-surface-low/50 border-[0.5px] border-outline-variant/30">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-6 p-6 bg-surface-low/50 border-[0.5px] border-outline-variant/30 relative overflow-hidden group">
+      {/* Background Pulse Effect */}
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 animate-pulse transition-opacity pointer-events-none" />
+      
+      <div className="flex flex-col gap-1 relative z-10">
         <div className="flex justify-between items-center">
-          <span className="font-display text-[0.55rem] text-primary uppercase tracking-[0.15rem] opacity-70">SISTEMA_OPERACIONAL</span>
-          <span className="font-display text-[0.55rem] text-secondary-container animate-pulse">ESTÁVEL</span>
+          <span className="font-display text-[0.55rem] text-primary uppercase tracking-[0.15rem] opacity-70 animate-flicker">SISTEMA_OPERACIONAL</span>
+          <span className="font-display text-[0.55rem] text-secondary-container animate-pulse-glow">ESTÁVEL</span>
         </div>
         <div className="flex gap-px h-1.5 mt-2">
           {segments.map((active, i) => (
             <div 
               key={i} 
-              className={`flex-1 transition-all duration-500 ${active ? 'bg-primary shadow-[0_0_5px_var(--tw-colors-primary-container)]' : 'bg-outline-variant/20'}`} 
+              className={`flex-1 transition-all duration-500 ${active ? 'bg-primary shadow-[0_0_5px_var(--tw-colors-primary-container)] animate-pulse-glow' : 'bg-outline-variant/20'}`} 
             />
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-4 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 border-[0.5px] border-primary/20">
-            <Activity size={12} className="text-primary" />
+          <div className="p-2 bg-primary/10 border-[0.5px] border-primary/20 group-hover:border-primary/50 transition-colors">
+            <Activity size={12} className="text-primary animate-pulse" />
           </div>
           <div className="flex flex-col">
             <span className="font-display text-[0.5rem] text-on-surface-variant uppercase tracking-[0.1rem]">CPU_LOAD</span>
-            <span className="font-display text-xs text-primary">{load}%</span>
+            <span className="font-display text-xs text-primary tabular-nums">{load}%</span>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-secondary-container/10 border-[0.5px] border-secondary-container/20">
-            <Shield size={12} className="text-secondary-container" />
+          <div className="p-2 bg-secondary-container/10 border-[0.5px] border-secondary-container/20 group-hover:border-secondary-container/50 transition-colors">
+            <Shield size={12} className="text-secondary-container animate-flicker" />
           </div>
           <div className="flex flex-col">
             <span className="font-display text-[0.5rem] text-on-surface-variant uppercase tracking-[0.1rem]">FIREWALL</span>
@@ -60,7 +63,7 @@ export const SystemStatus: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-tertiary-container/10 border-[0.5px] border-tertiary-container/20">
+          <div className="p-2 bg-tertiary-container/10 border-[0.5px] border-tertiary-container/20 group-hover:border-tertiary-container/50 transition-colors">
             <Terminal size={12} className="text-tertiary-container" />
           </div>
           <div className="flex flex-col">

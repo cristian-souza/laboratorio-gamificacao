@@ -2,6 +2,78 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Terminal as TerminalIcon, Command, ChevronRight } from 'lucide-react';
 import type { ProjectData } from './SpecimenCard';
 
+interface MatrixRainProps {
+  className?: string;
+}
+
+const MatrixRain: React.FC<MatrixRainProps> = ({ className = "" }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Ajusta o tamanho do canvas para o container pai
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+      }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Configurações da chuva Matrix
+    const characters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ$+-*/=%\"'#&_(),.;:?!\\|{}[]<>@";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops: number[] = [];
+
+    for (let i = 0; i < columns; i++) {
+      drops[i] = 1;
+    }
+
+    const draw = () => {
+      // Fundo preto semi-transparente para o efeito de rastro
+      ctx.fillStyle = "rgba(11, 14, 20, 0.15)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00fb40"; // Cor tertiary-container (verde neon)
+      ctx.font = `${fontSize}px "Space Grotesk", monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 45);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className={`absolute inset-0 pointer-events-none opacity-10 ${className}`} 
+    />
+  );
+};
+
 interface TerminalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -183,36 +255,39 @@ export const Terminal: React.FC<TerminalProps> = ({ isOpen, onClose }) => {
         {/* Terminal Content */}
         <div 
           ref={scrollRef}
-          className="flex-1 p-6 overflow-y-auto font-mono text-sm space-y-2 custom-scrollbar"
+          className="flex-1 p-6 overflow-y-auto font-mono text-sm space-y-2 custom-scrollbar relative"
         >
-          {history.map((entry, i) => (
-            <div 
-              key={i} 
-              className={`
-                ${entry.type === 'command' ? 'text-white font-bold' : ''}
-                ${entry.type === 'response' ? 'text-tertiary-container' : ''}
-                ${entry.type === 'error' ? 'text-secondary-container' : ''}
-                ${entry.type === 'success' ? 'text-primary' : ''}
-                ${entry.type === 'system' ? 'text-on-surface-variant opacity-60' : ''}
-              `}
-            >
-              {entry.content}
-            </div>
-          ))}
-          
-          <form onSubmit={handleCommand} className="flex items-center gap-2 pt-2">
-            <ChevronRight size={14} className="text-tertiary-container animate-pulse" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-white caret-tertiary-container"
-              spellCheck={false}
-              autoComplete="off"
-              disabled={isSyncing}
-            />
-          </form>
+          <MatrixRain />
+          <div className="relative z-10">
+            {history.map((entry, i) => (
+              <div 
+                key={i} 
+                className={`
+                  ${entry.type === 'command' ? 'text-white font-bold' : ''}
+                  ${entry.type === 'response' ? 'text-tertiary-container' : ''}
+                  ${entry.type === 'error' ? 'text-secondary-container' : ''}
+                  ${entry.type === 'success' ? 'text-primary' : ''}
+                  ${entry.type === 'system' ? 'text-on-surface-variant opacity-60' : ''}
+                `}
+              >
+                {entry.content}
+              </div>
+            ))}
+            
+            <form onSubmit={handleCommand} className="flex items-center gap-2 pt-2">
+              <ChevronRight size={14} className="text-tertiary-container animate-pulse" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-1 bg-transparent border-none outline-none text-white caret-tertiary-container"
+                spellCheck={false}
+                autoComplete="off"
+                disabled={isSyncing}
+              />
+            </form>
+          </div>
         </div>
 
         {/* Bottom Bar Info */}

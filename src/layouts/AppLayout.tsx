@@ -1,23 +1,15 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Settings, Bell, User, BarChart2, Zap, Shield, Terminal as TerminalIcon, Globe, Menu, X } from 'lucide-react';
-import { DataScrubber } from '../components/DataScrubber';
+import { BarChart2, Zap, Shield, Terminal as TerminalIcon, Globe, Menu, X } from 'lucide-react';
 import { SystemStatus } from '../components/SystemStatus';
 import { Terminal } from '../components/Terminal';
+import { LaboratoryBackground } from '../components/LaboratoryBackground';
 
 export default function AppLayout() {
   const location = useLocation();
   const path = location.pathname;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-
-  const getScrubberCurrent = () => {
-    if (path === '/') return 1;
-    if (path === '/projetos') return 2;
-    if (path === '/sobre') return 3;
-    if (path === '/contato') return 4;
-    return 1;
-  };
 
   const navLinks = [
     { to: "/", label: "GERAL XP", icon: BarChart2 },
@@ -27,9 +19,12 @@ export default function AppLayout() {
   ];
 
   return (
-      <div className="flex h-screen w-full bg-[#0b0e14] overflow-hidden text-on-surface font-body">
+      <div className="flex h-screen w-full bg-[#0b0e14] overflow-hidden text-on-surface font-body relative">
+          {/* AMBIENTE INTEGRADO: GAME + UNIVERSO + LABORATÓRIO */}
+          <LaboratoryBackground />
+
           {/* SIDEBAR - DESKTOP */}
-          <aside className="hidden md:flex flex-col w-[260px] bg-surface-low border-r-[0.5px] border-outline-variant/30 flex-shrink-0">
+          <aside className="hidden md:flex flex-col w-[260px] bg-surface-low/40 backdrop-blur-xl border-r-[0.5px] border-outline-variant/30 flex-shrink-0 relative z-10">
               <div className="p-6 border-b-[0.5px] border-outline-variant/30">
                   <h2 className="font-display text-primary font-bold text-lg tracking-[0.1rem]">
                       LAB_DE_DADOS_V1.0
@@ -138,20 +133,6 @@ export default function AppLayout() {
                           ))}
                       </div>
                   </div>
-
-                  <div className="flex gap-4 text-primary">
-                      <Settings
-                          size={18}
-                          className="cursor-pointer hover:text-primary-container transition-colors hidden sm:block"
-                      />
-                      <Bell
-                          size={18}
-                          className="cursor-pointer hover:text-primary-container transition-colors hidden sm:block"
-                      />
-                      <div className="w-8 h-8 md:w-5 md:h-5 rounded-full bg-primary/20 flex items-center justify-center cursor-pointer border-[0.5px] border-primary/50">
-                          <User size={16} className="md:size-[12px]" />
-                      </div>
-                  </div>
               </header>
 
               {/* Dynamic Page Content - Single scrollable container */}
@@ -191,9 +172,6 @@ export default function AppLayout() {
                   </footer>
               </main>
           </div>
-
-          {/* Global DataScrubber instance */}
-          <DataScrubber current={getScrubberCurrent()} total={4} />
 
           {/* Global Terminal Instance */}
           <Terminal 
