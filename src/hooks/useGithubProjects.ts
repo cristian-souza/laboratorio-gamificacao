@@ -36,10 +36,6 @@ export function useGithubProjects(username: string) {
             ...(repo.language ? [repo.language.toUpperCase()] : []),
             ...(repo.topics?.map(t => t.toUpperCase()) || [])
           ];
-
-          // Removemos os tópicos de controle da exibição visual
-          const displayTags = allTags.filter(tag => tag !== "PORTFOLIO" && tag !== "DESTAQUE");
-          
           return {
             id: repo.name.substring(0, 10).toUpperCase(),
             title: repo.name.replace(/-/g, ' ').toUpperCase(),
