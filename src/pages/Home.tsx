@@ -38,7 +38,7 @@ export default function Home() {
       }))
       .sort((a, b) => b.val - a.val)
       .slice(0, 4);
-  }, [projects, loading]);
+  }, [loading, portfolioProjects.length, projects]);
 
   return (
     <div className="p-8 md:p-12 pb-32 flex flex-col gap-16 max-w-7xl mx-auto w-full">
