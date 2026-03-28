@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Loader2 } from 'lucide-react';
-import { SpecimenCard } from '../components/SpecimenCard';
 import { SpecimenCarousel } from '../components/SpecimenCarousel';
 import { useGithubProjects } from '../hooks/useGithubProjects';
 
